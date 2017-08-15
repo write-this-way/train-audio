@@ -51,7 +51,7 @@ def halton(index, base):
 	f = 1.0 / base
 	i = 1.0 * index
 	while(i > 0):
-		result += f * (i % base)  
+		result += f * (i % base)
 		i = math.floor(i / base)
 		f = f / base
 	return result
@@ -70,7 +70,7 @@ def roundToNearest(n, nearest):
 
 # Read instruments from file
 with open(INSTRUMENTS_INPUT_FILE, 'rb') as f:
-	r = csv.reader(f, delimiter='\t')
+	r = csv.reader(f.read().splitlines())
 	next(r, None) # remove header
 	for name,type,price,bracket_min,bracket_max,file,from_gain,to_gain,from_tempo,to_tempo,gain_phase,tempo_phase,tempo_offset,interval_phase,interval,interval_offset,active in r:
 		if file and int(active):
@@ -102,7 +102,7 @@ with open(INSTRUMENTS_INPUT_FILE, 'rb') as f:
 
 # Read stations from file
 with open(STATIONS_INPUT_FILE, 'rb') as f:
-	r = csv.reader(f, delimiter='\t')
+	r = csv.reader(f.read().splitlines())
 	next(r, None) # remove header
 	for name,income_annual,income,lat,lng,borough in r:
 		index = len(stations)
@@ -230,7 +230,7 @@ def getGain(instrument, beat):
 	return gain
 
 # Get beat duration in ms based on current point in time
-def getBeatMs(instrument, beat, round_to):	
+def getBeatMs(instrument, beat, round_to):
 	from_beat_ms = instrument['from_beat_ms']
 	to_beat_ms = instrument['to_beat_ms']
 	beats_per_phase = instrument['tempo_phase']
@@ -244,7 +244,7 @@ def getBeatMs(instrument, beat, round_to):
 def isValidInterval(instrument, elapsed_ms):
 	interval_ms = instrument['interval_ms']
 	interval = instrument['interval']
-	interval_offset = instrument['interval_offset']	
+	interval_offset = instrument['interval_offset']
 	return int(math.floor(1.0*elapsed_ms/interval_ms)) % interval == interval_offset
 
 # Make sure there's no sudden drop in gain
@@ -314,7 +314,7 @@ for instrument in instruments:
 # Calculate total time
 total_seconds = int(1.0*total_ms/1000)
 print('Total sequence time: '+time.strftime('%M:%S', time.gmtime(total_seconds)) + '(' + str(total_seconds) + 's)')
-		
+
 # Sort sequence
 sequence = sorted(sequence, key=lambda k: k['elapsed_ms'])
 
@@ -327,7 +327,7 @@ for index, step in enumerate(sequence):
 # Write instruments to file
 if WRITE_SEQUENCE:
 	with open(INSTRUMENTS_OUTPUT_FILE, 'wb') as f:
-		w = csv.writer(f)	
+		w = csv.writer(f)
 		for index, instrument in enumerate(instruments):
 			w.writerow([index])
 			w.writerow([instrument['file']])
@@ -338,7 +338,7 @@ if WRITE_SEQUENCE:
 # Write sequence to file
 if WRITE_SEQUENCE:
 	with open(SEQUENCE_OUTPUT_FILE, 'wb') as f:
-		w = csv.writer(f)	
+		w = csv.writer(f)
 		for step in sequence:
 			w.writerow([step['instrument_index']])
 			w.writerow([step['position']])
@@ -388,7 +388,7 @@ if WRITE_JSON:
 			'name': station['name'],
 			'borough': station['borough'].upper(),
 			'borough_next': station['borough_next'].upper(),
-			'duration': station['duration'],			
+			'duration': station['duration'],
 			'elapsed_duration': elapsed_duration,
 			'min_duration': min_duration,
 			'lat': station['lat'],
@@ -401,4 +401,3 @@ if WRITE_JSON:
 	with open(MAP_VISUALIZATION_OUTPUT_FILE, 'w') as outfile:
 		json.dump(json_data, outfile)
 	print('Successfully wrote to JSON file: '+MAP_VISUALIZATION_OUTPUT_FILE)
-
